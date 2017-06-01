@@ -1,0 +1,81 @@
+## 核心概念
+
+单例模式:　一个实例，并且提供对外全局访问.
+
+##### JavaScript中的单例模式
+
+> 原理
+
+提供一个变量标志来判断是否已经创建过对象实例,如果没有就创建一个对象实例,
+如果创建过,就返回之前创建的.
+
+```
+var element;
+if (!element) {
+  // 创建一个单例
+  element = new xxxx;
+}
+return  element // 已经创建的单例
+
+```
+
+那么我们如何能够提供一个对外的接口？
+
+```
+
+JavaScript的闭包 ---> 封装
+
+```
+
+> 惰性单例: 只在需要的时候才创建对象的实例,
+
+
+场景需要: 无论点击多少次按钮只打开一个指向百度的iframe.
+
+```
+<body>
+	<button type="button" id='openBtn'>打开</button>
+
+	<script type="text/javascript">
+		// 创建实例例的函数
+		var createIframe = function () {
+			var iframe = document.createElement('iframe');
+			iframe.style.display = 'none';
+			document.body.appendChild(iframe);
+			return iframe;
+		}
+		// 获取单例的函数
+		var getIframe = function (fn) {
+			var obj;
+			return function () {
+				if (!obj) {
+					obj = fn()
+					console.log('第一次创建')
+				}
+				return obj
+			}
+		}
+		var getSingle = getIframe(createIframe);
+
+		document.getElementById('openBtn').onclick = function (){
+			var iframe =  getSingle();
+			iframe.style.display = 'block'
+			iframe.src = 'http://www.baidu.com'
+		}
+	</script>
+</body>
+```
+注意点：
+
+```
+
+1. 不可以直接在点击事件中这样绑定:
+var iframe = getIframe(createIframe)();
+这样会每次点击创建一个.
+var getSingle = getIframe(createIframe);这样做利用了闭包的特性,
+obj不会被垃圾回收掉.
+
+2. 把创建对象(实例)的函数与管理(获取)单例的函数分隔开.
+有利于扩展与维护.
+
+```
